@@ -1,3 +1,42 @@
+
+pipeline{
+	agent any
+	tools{
+	maven "maven3.8.4"
+	}
+	stages{
+	 stage('GitCloneStart'){
+	  steps{
+	 git "https://github.com/cchi12/maven-web-app.git"
+	 }
+	}
+   stage('StartBuild'){
+	  steps{
+	 sh "echo executing build"
+	 sh "echo Build start"
+	 sh "mvn clean package"
+	 sh "echo end of build"
+	 }
+	}
+   stage('CodeQualityReport'){
+	  steps{
+	 sh "echo Running code Quality Report"
+	 sh "mvn sonar:sonar"
+	 sh "echo end of code quality report"
+	 }
+	}
+ stage('UploadArtifacts'){
+	  steps{
+	 sh "echo Uploading to snapshot repo"
+	 sh "mvn deploy"
+     }
+
+   }
+     
+ }
+}
+
+/*
 node
  {
   
@@ -10,7 +49,7 @@ node
       echo "Jenkins Home ${env.JENKINS_HOME}"
       echo "Jenkins URL ${env.JENKINS_URL}"
       echo "JOB Name ${env.JOB_NAME}"
- /* 
+ 
    properties([[$class: 'JiraProjectProperty'], buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '2', daysToKeepStr: '', numToKeepStr: '2')), pipelineTriggers([pollSCM('* * * * *')])])
   
   stage("CheckOutCodeGit")
